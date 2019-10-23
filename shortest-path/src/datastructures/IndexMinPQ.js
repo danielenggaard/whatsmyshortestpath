@@ -1,14 +1,11 @@
-export class IndexMinPQ {
+export default class IndexMinPQ {
 
     constructor(n) {
-        this.n = 0;
+        this.n = 0; // Number of elements in the data structure
+
         this.keys = new Array(n + 1);
-        Object.seal(this.keys);
-        this.q = new Array(n + 1);
-        Object.seal(this.q);
-        this.qp = new Array(n + 1);
-        Object.seal(this.qp);
-        for(i = 0; i <= n; i++) qp[i] = -1;
+        this.pq = new Array(n + 1);
+        this.qp = new Array(n + 1).fill(-1);
     }
 
     isEmpty = () => this.n === 0;
@@ -38,14 +35,14 @@ export class IndexMinPQ {
 
     change(k, v) {
         this.keys[k] = v;
-        this.swim(qp[k]);
-        this.sink(qp[k]);
+        this.swim(this.qp[k]);
+        this.sink(this.qp[k]);
     }
 
     delete(k) {
         this.exch(k, this.n --);
-        this.swim(qp[k]);
-        this.sink(qp[k]);
+        this.swim(this.qp[k]);
+        this.sink(this.qp[k]);
         this.keys[this.qp[this.n + 1]] = null;
         this.qp[this.pq[this.n + 1]] = -1;
     }
@@ -53,7 +50,7 @@ export class IndexMinPQ {
     swim(k) {
         while (k > 1 && this.less(k / 2, k)) {
             this.exch(k / 2, k);
-            k = k / 2;
+            k /= 2;
         }
     }
 

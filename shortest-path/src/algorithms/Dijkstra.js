@@ -1,7 +1,11 @@
 import { fields, set } from './fields';
 import IndexMinPQ from '../datastructures/IndexMinPQ';
 
-class Dijkstra {
+export default class Dijkstra {
+
+    constructor(graph) {
+        this.graph = graph;
+    }
 
     invoke(n) {
         set('pq', new IndexMinPQ(n));
@@ -17,10 +21,10 @@ class Dijkstra {
     }
 
     setUp() {
-        for(v = 0; v < fields.graph.v(); v++)
+        for(let v = 0; v < this.graph.v(); v++)
             fields.distTo[v] = Number.POSITIVE_INFINITY;
         fields.distTo[fields.start] = 0.0;
-        fields.pq.insert(s, 0.0);
+        fields.pq.insert(fields.start, 0.0);
     }
 
     relax(v) {
