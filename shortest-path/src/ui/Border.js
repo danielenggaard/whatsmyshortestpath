@@ -1,9 +1,11 @@
-import React, { PureComponent } from 'react'
-import { states, rows, columns } from './constants';
+import React, { PureComponent, Component } from 'react'
+import { states, rows, columns, colors } from './constants';
 import GraphBuilder from "./GraphBuilder";
 import Dijkstra from '../algorithms/Dijkstra';
+import { mapIndexToSquare } from '../algorithms/operations';
+import AStar from '../algorithms/AStar';
 
-export default class Border extends PureComponent  {
+export default class Border extends Component  {
 
     constructor(props) {
         super(props);
@@ -24,6 +26,10 @@ export default class Border extends PureComponent  {
         }
     }
 
+    componentDidMount() {
+        this.setStartAndEnd(403, 800);
+    }
+
     initBoard() {
         const board = [];
 
@@ -40,11 +46,12 @@ export default class Border extends PureComponent  {
         const columns = [];
 
         board[row].forEach(square => {
+
             columns.push(
                 <td
                     key={`${row}_${square.column}`}
                     style={{
-                        backgroundColor: 'rgb(230, 230, 230)',
+                        backgroundColor: colors[square.state],
                         border: '1px solid black'
                     }}
                     onClick={() => console.log(this.state.board[row][square.column])}
@@ -56,9 +63,21 @@ export default class Border extends PureComponent  {
         return columns;
     }
 
+    async setVisited(index) {
+        const { board } = this.state;
+        const square = mapIndexToSquare(index, board, columns, rows);
+        square.state = states.DISCOVERED;
+        return new Promise(resolve =>
+            setTimeout(() => {
+                this.setState({ board }, () => {
+                    resolve();
+                })
+            }, 5)
+        );
+    }
+
     createRows() {
         const { board } = this.state;
-
         const grid = [];
         board.forEach( (row, i) => {
             grid[i] = 
@@ -72,9 +91,23 @@ export default class Border extends PureComponent  {
     buildGraph() {
         const { board } = this.state;
         this.g = new GraphBuilder(board, rows, columns).build();
-        const x = new Dijkstra(this.g);
-        x.invoke(rows * columns);
-        console.log(x);
+        let x = new AStar(this.g, rows * columns, 403, 800, board, columns, rows);
+        x.setBoard(this);
+
+        x.invoke();
+        x = null;
+        this.g = null;
+    }
+
+    setStartAndEnd(s, e) {
+        const { board } = this.state;
+        const start = mapIndexToSquare(s, board, columns, rows);
+        const end = mapIndexToSquare(e, board, columns, rows);
+
+
+        start.state = states.START;
+        end.state = states.END;
+        this.setState({ board })
     }
 
     render() {

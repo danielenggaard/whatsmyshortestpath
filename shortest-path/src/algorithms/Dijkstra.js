@@ -1,45 +1,74 @@
-import { fields, set } from './fields';
 import IndexMinPQ from '../datastructures/IndexMinPQ';
 
 export default class Dijkstra {
 
-    constructor(graph) {
+    constructor(graph, n, start, end) {
         this.graph = graph;
+        this.pq = new IndexMinPQ(n);
+        this.distTo = new Array(n);
+        this.edgeTo = new Array(n);
+        this.start = start;
+        this.end = end;
     }
 
-    invoke(n) {
-        set('pq', new IndexMinPQ(n));
-        const [ end, pq ] = fields;
+    setBoard = board => this.board = board;
+
+    async invoke() {
+
 
         this.setUp();
-
-        while(!pq.isEmpty()) {
-            const min = pq.delMin();
-            if(min === end) break;
-            this.relax(min)
+        while(!this.pq.isEmpty()) {
+            const min = this.pq.delMin();
+            if(min === this.end) break;
+            
+            await this.relax(min);
         }
     }
 
     setUp() {
-        for(let v = 0; v < this.graph.v(); v++)
-            fields.distTo[v] = Number.POSITIVE_INFINITY;
-        fields.distTo[fields.start] = 0.0;
-        fields.pq.insert(fields.start, 0.0);
+        for(let v = 0; v < this.graph.v; v++)
+            this.distTo[v] = Number.POSITIVE_INFINITY;
+        this.distTo[this.start] = 0.0;
+        this.pq.insert(this.start, 0.0);
     }
 
-    relax(v) {
-        const [ graph, distTo, edgeTo, pq ] = fields;
+    async relax(v) {        
+        const adj = this.graph.adj[v];
+            for (let i = 0; i < adj.length; i++) 
+                await this.updatedistance(adj[i]);
 
-        graph.adj(v).foreach(neighbour => {
-            let w = neighbour.to();
+        return new Promise(resolve => resolve());
+    }
 
-            if(distTo[w] > distTo[v] + neighbour.weight()) {
-                distTo[w] = distTo[v] + neighbour.weight();
-                edgeTo[w] = neighbour;
-                if (pq.contains(neighbour)) pq.change(neighbour, distTo[neighbour]);
-                else pq.insert(w, distTo[neighbour]);
-            }
+    async updatedistance(e, weight) {
+        const pq = this.pq;
+        const distTo = this.distTo;
+        const to = e.to;
+
+        if(distTo[to] > distTo[e.from] + e.weight) {
+        distTo[to] = this.distTo[e.from] + e.weight;
+        this.edgeTo[to] = e;
+
+        await this.board.setVisited(to);
+        return new Promise(resolve => {
+            if (pq.contains(to)) pq.change(to, distTo[to]);
+            else                 pq.insert(to, distTo[to]);
+            resolve();
         });
-
+        
+        }
     }
+
+    pathTo(v) {
+        if (!this.hasPathTo(v)) return null;
+        const path = [];
+        let edge = this.edgeTo[v];
+        while(edge != null) {
+            path.push(edge);
+            edge = this.edgeTo[edge.from];
+        }
+        return path;
+    }
+
+    hasPathTo = v => this.distTo[v] < Number.POSITIVE_INFINITY;
 }

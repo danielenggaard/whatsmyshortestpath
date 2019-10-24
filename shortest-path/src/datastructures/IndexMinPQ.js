@@ -1,37 +1,41 @@
 export default class IndexMinPQ {
 
     constructor(n) {
+        this.maxN = n;
         this.n = 0; // Number of elements in the data structure
 
         this.keys = new Array(n + 1);
         this.pq = new Array(n + 1);
-        this.qp = new Array(n + 1).fill(-1);
+        this.qp = new Array(n + 1);
+        for(let i = 0; i < this.qp.length; i++) this.qp[i] = -1;
     }
 
     isEmpty = () => this.n === 0;
 
-    contains = k => this.qp[k] != -1;
+    contains = index => this.qp[index] !== -1;
 
-    insert(k, key) {
+
+    insert(i, key) {
+        if (i < 0 || i >= this.maxN) throw Error("Illegal insert for i in priority queue.");
+        if (this.contains(i)) throw Error("Index is already in the priority queue.");
         this.n ++;
-        this.qp[k] = this.n;
-        this.pq[this.n]  = k;
-        this.keys[k] = key;
+        this.qp[i] = this.n;
+        this.pq[this.n]  = i;
+        this.keys[i] = key;
         this.swim(this.n);
     }
 
-    min = () => this.keys[this.pq[1]];
-
     delMin() {
+        if (this.n === 0) throw Error("Priority queue underflox.");
         const indexOfMin = this.pq[1];
-        this.exch(1, this.n --);
+        this.exch(1, this.n--);
         this.sink(1);
-        this.keys[this.qp[this.n + 1]] = null;
-        this.qp[this.pq[this.n + 1]] = -1;
+        if (indexOfMin !== this.pq[this.n + 1]) throw Error("Index of min is not equal to pq[n + 1]");
+        this.qp[indexOfMin] = -1;
+        this.keys[indexOfMin] = null;
+        this.pq[this.n + 1] = -1;
         return indexOfMin;
     }
-
-    minIndex = () => this.pq[1];
 
     change(k, v) {
         this.keys[k] = v;
@@ -39,37 +43,31 @@ export default class IndexMinPQ {
         this.sink(this.qp[k]);
     }
 
-    delete(k) {
-        this.exch(k, this.n --);
-        this.swim(this.qp[k]);
-        this.sink(this.qp[k]);
-        this.keys[this.qp[this.n + 1]] = null;
-        this.qp[this.pq[this.n + 1]] = -1;
-    }
-
     swim(k) {
-        while (k > 1 && this.less(k / 2, k)) {
-            this.exch(k / 2, k);
-            k /= 2;
+        while (k > 1 && this.greater(Math.abs(k / 2), k)) {
+            this.exch(k, Math.abs(k / 2));
+            Math.abs(k /= 2);
         }
     }
 
     sink(k) {
-        while(2* k <= this.n) {
-            let j = 2*k;
-            if (j < this.n && this.less(j, j + 1)) j++;
-            if (!this.less(k, j)) break;
+        while(2 * k <= this.n) {
+            let j = 2 * k;
+            if (j < this.n && this.greater(j, j + 1)) j++;
+            if (!this.greater(k, j)) break;
             this.exch(k, j);
             k = j;
         }
     }
 
-    less = (i, j) => this.pq[i] < this.pq[j];
+    greater = (a, b) => this.keys[this.pq[a]] > this.keys[this.pq[b]];
 
     exch(i, j) {
-        const t = this.pq[i];
+        const swap = this.pq[i];
         this.pq[i] = this.pq[j];
-        this.pq[j] = t;
+        this.pq[j] = swap;
+        this.qp[this.pq[i]] = i;
+        this.qp[this.pq[j]] = j;
     }
 
 }

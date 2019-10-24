@@ -1,9 +1,5 @@
 
 const fields = {
-    graph: undefined,
-    distTo: undefined,
-    edgeTo: undefined,
-    pq: undefined,
     start: undefined,
     end: undefined
 }
