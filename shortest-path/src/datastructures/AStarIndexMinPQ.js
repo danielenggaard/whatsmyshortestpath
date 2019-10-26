@@ -1,25 +1,18 @@
 import IndexMinPQ from "./IndexMinPQ";
-export const mapIndexToSquare = (index, board, columns, rows) => board[index % rows][ Math.floor(index / columns)];
-
 
 export default class AStarIndexMinPQ extends IndexMinPQ {
 
-    constructor(n, heuristic, end, board, columns, rows) {
+    constructor(n, heuristic, end, board) {
         super(n);
         this.heuristic = heuristic;
         this.end = end;
         this.board = board;
-        this.columns = columns;
-        this.rows = rows;
     }
 
     greater = (a, b) => {
-        const flooredA = Math.floor(a);
-        const flooredB = Math.floor(b)
-        const { end, board, columns, rows } = this;
-
-        return ( this.heuristic(this.pq[flooredA], end, board, columns, rows) + this.keys[this.pq[flooredA]] ) > 
-                ( this.heuristic(this.pq[flooredB], end, board, columns, rows) + this.keys[this.pq[flooredB]] );
+        const { end, board, heuristic, pq, keys } = this;
+        return ( heuristic(pq[Math.floor(a)], end, board) + keys[pq[Math.floor(a)]] ) > 
+                 ( heuristic(pq[Math.floor(b)], end, board) + keys[pq[Math.floor(b)]] );
     }
 
 }

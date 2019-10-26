@@ -1,22 +1,25 @@
-import React, { PureComponent, Component } from 'react'
-import { states, rows, columns, colors } from './constants';
+import React, { Component } from 'react'
+import { states, rows, columns, colors, fields } from '../constants';
 import GraphBuilder from "./GraphBuilder";
-import Dijkstra from '../algorithms/Dijkstra';
 import { mapIndexToSquare } from '../algorithms/operations';
-import AStar from '../algorithms/AStar';
+import AppBar from './AppBar';
+import { instantiate } from '../algorithms/Factory';
 
 export default class Border extends Component  {
 
     constructor(props) {
         super(props);
-        this.rows = rows;
-        this.columns = columns;
         this.state = {
-
+            delay: 5,    // Unit is in ms.
+            algorithm: "AStar"
         }
 
         this.initBoard();
+        this.onDelayChange = this.onDelayChange.bind(this);
+        this.startAlgorithm = this.startAlgorithm.bind(this);
     }
+
+    setAlgorithm = e => this.setState({ algorithm: e.target.value });
 
     createArea(row, column) {
         return {
@@ -27,19 +30,21 @@ export default class Border extends Component  {
     }
 
     componentDidMount() {
-        this.setStartAndEnd(403, 800);
+        this.setStartAndEnd(fields.start, fields.end);
     }
 
     initBoard() {
         const board = [];
 
-        for(let row = 0; row < this.rows; row++) {
+        for(let row = 0; row < rows; row++) {
             board[row] = [];
-            for(let column = 0; column < this.columns; column++) 
+            for(let column = 0; column < columns; column++) 
                 board[row][column] = this.createArea(row, column);
         }
         this.state.board = board;
     }
+
+    onDelayChange = delay => this.setState({ delay });
 
     createColumn(row) {
         const { board } = this.state;
@@ -63,47 +68,45 @@ export default class Border extends Component  {
         return columns;
     }
 
-    async setVisited(index) {
-        const { board } = this.state;
+    async setVisited(index, state) {
+        const { board, delay } = this.state;
         const square = mapIndexToSquare(index, board, columns, rows);
-        square.state = states.DISCOVERED;
+        square.state = state;
         return new Promise(resolve =>
             setTimeout(() => {
                 this.setState({ board }, () => {
                     resolve();
-                })
-            }, 5)
+                });
+            }, delay)
         );
     }
 
     createRows() {
         const { board } = this.state;
         const grid = [];
-        board.forEach( (row, i) => {
-            grid[i] = 
-                    <tr key={i}>
-                        {this.createColumn(i)}
-                    </tr>
+        board.forEach( (row, i) => { grid[i] = 
+            <tr key={i}>
+                {this.createColumn(i)}
+            </tr>
         });
         return grid;
     }
 
-    buildGraph() {
-        const { board } = this.state;
+    startAlgorithm() {
+        const { board, algorithm } = this.state;
         this.g = new GraphBuilder(board, rows, columns).build();
-        let x = new AStar(this.g, rows * columns, 403, 800, board, columns, rows);
-        x.setBoard(this);
-
-        x.invoke();
-        x = null;
+        let algo = instantiate(algorithm, this.g, rows * columns, fields.start, fields.end, board);
+        algo.setBoard(this);
+        algo.invoke();
+        algo = null;
         this.g = null;
     }
 
     setStartAndEnd(s, e) {
         const { board } = this.state;
-        const start = mapIndexToSquare(s, board, columns, rows);
-        const end = mapIndexToSquare(e, board, columns, rows);
 
+        const start = mapIndexToSquare(s, board, rows, columns);
+        const end = mapIndexToSquare(e, board, rows, columns);
 
         start.state = states.START;
         end.state = states.END;
@@ -111,8 +114,17 @@ export default class Border extends Component  {
     }
 
     render() {
+        const { delay, algorithm } = this.state;
+
         return <React.Fragment>
-        <button onClick={() => this.buildGraph()}>Click click</button>
+            <AppBar
+                setAlgorithm={this.setAlgorithm}
+                algorithm={algorithm}
+                startAlgorithm={this.startAlgorithm}
+                onDelayChange={this.onDelayChange}
+                delay={delay}
+            />
+        
         <table
             style={{
                width: '100%',

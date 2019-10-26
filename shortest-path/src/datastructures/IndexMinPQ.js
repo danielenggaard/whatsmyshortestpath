@@ -44,13 +44,15 @@ export default class IndexMinPQ {
     }
 
     swim(k) {
-        while (k > 1 && this.greater(Math.abs(k / 2), k)) {
-            this.exch(k, Math.abs(k / 2));
-            Math.abs(k /= 2);
+        k = Math.floor(k);
+        while (k > 1 && this.greater(k / 2, k)) {
+            this.exch(k, k / 2);
+            k = Math.floor(k / 2);
         }
     }
 
     sink(k) {
+        k = Math.floor(k);
         while(2 * k <= this.n) {
             let j = 2 * k;
             if (j < this.n && this.greater(j, j + 1)) j++;
@@ -60,9 +62,11 @@ export default class IndexMinPQ {
         }
     }
 
-    greater = (a, b) => this.keys[this.pq[a]] > this.keys[this.pq[b]];
+    greater = (a, b) => this.keys[this.pq[Math.floor(a)]] > this.keys[this.pq[Math.floor(b)]];
 
     exch(i, j) {
+        i = Math.floor(i);
+        j = Math.floor(j);
         const swap = this.pq[i];
         this.pq[i] = this.pq[j];
         this.pq[j] = swap;

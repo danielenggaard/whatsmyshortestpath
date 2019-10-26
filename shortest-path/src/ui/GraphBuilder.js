@@ -1,5 +1,5 @@
 import DirectedEdge from '../datastructures/DirectedEdge';
-import { eucledian, mapSquaresToIndex } from "../algorithms/operations";
+import { eucledian, mapSquareToIndex } from "../algorithms/operations";
 import Digraph from '../datastructures/Digraph';
 
 
@@ -30,8 +30,8 @@ export default class GraphBuilder {
     addEdge(from, to) {
 
         const weight = eucledian(from, to);
-        const edge = new DirectedEdge(mapSquaresToIndex(from, this.columns), 
-                                      mapSquaresToIndex(to, this.columns), 
+        const edge = new DirectedEdge(mapSquareToIndex(from, this.columns), 
+                                      mapSquareToIndex(to, this.columns), 
                                       weight);
         this.g.addEdge(edge);
     }

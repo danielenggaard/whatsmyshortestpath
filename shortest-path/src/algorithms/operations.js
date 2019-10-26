@@ -1,21 +1,25 @@
+import { columns, rows } from "../constants";
 
 export const eucledian = (from, to) => 
     Math.sqrt( Math.pow((from.row - to.row), 2) + Math.pow((from.column - to.column), 2));
 
 export const manhatten = (from, to) =>
-    Math.abs(from.row - to.row) + Math.abs(from.column + to.column);
+    Math.abs(to.row - from.row) + Math.abs(to.column - from.column);
 
-export const manhattenHeuristic = (fromIndex, toIndex, board, columns, rows) =>
+export const manhattenHeuristic = (fromIndex, toIndex, board) => 
     manhatten(
-        mapIndexToSquare(fromIndex, board, columns, rows), 
-        mapIndexToSquare(toIndex, board, columns, rows)
+        mapIndexToSquare(fromIndex, board), 
+        mapIndexToSquare(toIndex, board)
     );
 
-export const mapSquaresToIndex = (square, columns) => square.column * columns + square.row;
+export const eucledianHeuristic = (fromIndex, toIndex, board) => 
+    eucledian(
+        mapIndexToSquare(fromIndex, board), 
+        mapIndexToSquare(toIndex, board)
+    );
 
-export const mapIndexToSquare = (index, board, columns, rows) => board[index % rows][ Math.floor(index / columns)];
+export const mapSquareToIndex = square => square.column * columns + square.row;
 
-export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
+export const mapIndexToSquare = (index, board) => board[index % rows][Math.floor(index / columns)];
 
 

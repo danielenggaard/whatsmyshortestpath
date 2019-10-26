@@ -1,4 +1,6 @@
 import IndexMinPQ from '../datastructures/IndexMinPQ';
+import { states } from "../constants"
+import { mapSquareToIndex } from './operations';
 
 export default class Dijkstra {
 
@@ -23,6 +25,10 @@ export default class Dijkstra {
             
             await this.relax(min);
         }
+
+        const path = this.pathTo(this.end);
+        for(let i = 0; i < path.length; i++) 
+            await this.board.setVisited(path[i].from, states.PATH);
     }
 
     setUp() {
@@ -36,8 +42,6 @@ export default class Dijkstra {
         const adj = this.graph.adj[v];
             for (let i = 0; i < adj.length; i++) 
                 await this.updatedistance(adj[i]);
-
-        return new Promise(resolve => resolve());
     }
 
     async updatedistance(e, weight) {
@@ -49,7 +53,7 @@ export default class Dijkstra {
         distTo[to] = this.distTo[e.from] + e.weight;
         this.edgeTo[to] = e;
 
-        await this.board.setVisited(to);
+        await this.board.setVisited(to, states.DISCOVERED);
         return new Promise(resolve => {
             if (pq.contains(to)) pq.change(to, distTo[to]);
             else                 pq.insert(to, distTo[to]);
