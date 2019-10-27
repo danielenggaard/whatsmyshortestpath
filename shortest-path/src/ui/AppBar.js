@@ -1,4 +1,5 @@
 import React from 'react'
+import { shortestPaths }from '../constants';
 import { MenuItem, Select, FormControl, InputLabel, Box, 
         Button, Typography, Slider, Radio, RadioGroup, FormLabel, 
         FormControlLabel } from "@material-ui/core";
@@ -22,8 +23,8 @@ export default function AppBar(props) {
                         value={props.algorithm}
                         onChange={props.setAlgorithm}
                     >
-                        <MenuItem value={"Dijkstra"}>Dijkstra</MenuItem>
-                        <MenuItem value={"AStar"}>A*</MenuItem>
+                        <MenuItem value={shortestPaths.DIJKSTRA}>Dijkstra</MenuItem>
+                        <MenuItem value={shortestPaths.ASTAR}>A*</MenuItem>
                     </Select>
                 </FormControl>
             </Box>
@@ -63,7 +64,10 @@ export default function AppBar(props) {
                 <Button color="secondary" variant="contained" onClick={props.clearBoard}>Clear</Button>
             </Box>
             <Box mx={2}>
-                <Button color="primary" variant="contained" onClick={props.startAlgorithm}>Run</Button>
+                <Button color="primary" variant="contained" onClick={props.startAlgorithm}>Start</Button>
+            </Box>
+            <Box mx={2}>
+                <Button color="secondary" variant="contained" value={false} onClick={props.onAlgoIsOn}>Stop</Button>
             </Box>
         </Box>
     </React.Fragment>

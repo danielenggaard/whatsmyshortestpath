@@ -22,10 +22,14 @@ const styles = {
     [states.PATH] : 'path'
 }
 
-
+const shortestPaths = {
+    DIJKSTRA: 1,
+    ASTAR: 2,
+    DFS: 3
+}
 
 
 const rows = 30;
 const columns = 30;
 
-export { states, rows, columns, colors, styles }
+export { states, rows, columns, colors, styles, shortestPaths }

@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { states, rows, columns, colors, styles } from '../constants';
+import { states, rows, columns, colors, styles, shortestPaths } from '../constants';
 import GraphBuilder from "./GraphBuilder";
 import { mapIndexToSquare, mapSquareToIndex } from '../algorithms/operations';
 import AppBar from './AppBar';
-import { instantiate } from '../algorithms/Factory';
+import { instantiate, algorithms, heuristic } from '../algorithms/Factory';
 import './States.css';
 
 export default class Border extends Component  {
@@ -13,7 +13,7 @@ export default class Border extends Component  {
         this.state = {
             board: [],
             delay: 1,    // Unit is in ms.
-            algorithm: "AStar",
+            algorithm: shortestPaths.ASTAR,
             squareClick: "start",
             start: 1,
             end: 10,
@@ -28,6 +28,13 @@ export default class Border extends Component  {
         this.setDestination = this.setDestination.bind(this);
         this.handleSquareClick = this.handleSquareClick.bind(this);
         this.initBoard = this.initBoard.bind(this);
+    }
+
+    setAlgorithmsParams() {
+        const { start, end, board } = this.state;
+        algorithms[shortestPaths.DIJKSTRA].args = [this.g, rows * columns, start, end, board];
+        // Todo: make heuristic optional
+        algorithms[shortestPaths.ASTAR].args = [this.g, rows * columns, start, end, board, heuristic.MANHATTEN];
     }
 
     setDestination = e => this.setState({ squareClick: e.target.value });
@@ -60,7 +67,7 @@ export default class Border extends Component  {
     }
 
     initBoard() {
-        const { start, end, board } = this.state;
+        let { start, end, board } = this.state;
 
         for(let row = 0; row < rows; row++) {
             board[row] = [];
@@ -74,6 +81,8 @@ export default class Border extends Component  {
         this.setEnd(end);
         this.setState({ board });
     }
+
+    onAlgoIsOn = e => this.algoIsOn = e.target.value;
 
     onDelayChange = delay => this.setState({ delay });
 
@@ -124,15 +133,22 @@ export default class Border extends Component  {
         return grid;
     }
 
+    createAlgorithm = () => {
+        this.setAlgorithmsParams();
+        this.algo = instantiate(this.state.algorithm);
+        this.algo.setBoard(this);
+    }
+
+    
+
     startAlgorithm() {
-        const { board, algorithm, start, end } = this.state;
+        const { board } = this.state;
         this.initBoard();
         this.algoIsOn = true;
         this.g = new GraphBuilder(board, rows, columns).build();
-        let algo = instantiate(algorithm, this.g, rows * columns, start, end, board);
-        algo.setBoard(this);
-        algo.invoke();
-        algo = null;
+        this.createAlgorithm();
+        this.algo.invoke();
+        this.algo = null;
         this.g = null;
     }
 
@@ -165,6 +181,7 @@ export default class Border extends Component  {
                 setDestination={this.setDestination}
                 destination={this.state.squareClick}
                 clearBoard={this.initBoard}
+                onAlgoIsOn={this.onAlgoIsOn}
             />
         
         <table

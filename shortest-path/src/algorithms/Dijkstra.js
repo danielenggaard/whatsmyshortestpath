@@ -17,16 +17,17 @@ export default class Dijkstra {
     async invoke() {
         this.setUp();
         while(!this.pq.isEmpty()) {
+            if (!this.board.algoIsOn) return;
             const min = this.pq.delMin();
             if(min === this.end) break;
             await this.relax(min);
         }
 
         const path = this.pathTo(this.end);
-        for(let i = 0; i < path.length; i++) 
+        await this.board.setVisited(path[0].to, states.END);
+        for(let i = 0; i < path.length - 1; i++)
             await this.board.setVisited(path[i].from, states.PATH);
         this.board.algoIsOn = false;
-
     }
 
     setUp() {
@@ -42,7 +43,7 @@ export default class Dijkstra {
                 await this.updatedistance(adj[i]);
     }
 
-    async updatedistance(e, weight) {
+    async updatedistance(e) {
         const pq = this.pq;
         const distTo = this.distTo;
         const to = e.to;
@@ -56,8 +57,7 @@ export default class Dijkstra {
             if (pq.contains(to)) pq.change(to, distTo[to]);
             else                 pq.insert(to, distTo[to]);
             resolve();
-        });
-        
+        });  
         }
     }
 

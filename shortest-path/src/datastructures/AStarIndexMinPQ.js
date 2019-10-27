@@ -13,6 +13,10 @@ export default class AStarIndexMinPQ extends IndexMinPQ {
         const { end, board, heuristic, pq, keys } = this;
         const pqA = pq[Math.floor(a)];
         const pqB = pq[Math.floor(b)];
+        console.log(pqA);
+        console.log(pqB);
+        console.log(board);
+
         return ( keys[pqA] + heuristic(pqA, end, board) ) > 
                 ( keys[pqB] + heuristic(pqB, end, board) );
     }
