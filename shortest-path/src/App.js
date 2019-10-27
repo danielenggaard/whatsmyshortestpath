@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import Border from './ui/Border';
 
 function App() {

@@ -17,7 +17,7 @@ export default class IndexMinPQ {
 
     insert(i, key) {
         if (i < 0 || i >= this.maxN) throw Error("Illegal insert for i in priority queue.");
-        if (this.contains(i)) throw Error("Index is already in the priority queue.");
+        if (this.contains(i)) throw Error(`Index ${i} is already in the priority queue.`);
         this.n ++;
         this.qp[i] = this.n;
         this.pq[this.n]  = i;

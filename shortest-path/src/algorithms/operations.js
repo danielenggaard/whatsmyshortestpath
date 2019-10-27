@@ -1,7 +1,7 @@
 import { columns, rows } from "../constants";
 
 export const eucledian = (from, to) => 
-    Math.sqrt( Math.pow((from.row - to.row), 2) + Math.pow((from.column - to.column), 2));
+    Math.sqrt( Math.pow((to.row - from.row), 2) + Math.pow((to.column - from.column), 2) );
 
 export const manhatten = (from, to) =>
     Math.abs(to.row - from.row) + Math.abs(to.column - from.column);

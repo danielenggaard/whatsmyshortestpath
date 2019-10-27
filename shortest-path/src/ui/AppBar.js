@@ -1,5 +1,7 @@
 import React from 'react'
-import { MenuItem, Select, FormControl, InputLabel, Box, Button, Typography, Slider } from "@material-ui/core";
+import { MenuItem, Select, FormControl, InputLabel, Box, 
+        Button, Typography, Slider, Radio, RadioGroup, FormLabel, 
+        FormControlLabel } from "@material-ui/core";
 
 export default function AppBar(props) {
 
@@ -22,15 +24,8 @@ export default function AppBar(props) {
                     >
                         <MenuItem value={"Dijkstra"}>Dijkstra</MenuItem>
                         <MenuItem value={"AStar"}>A*</MenuItem>
-
                     </Select>
                 </FormControl>
-            </Box>
-            <Box
-                display="flex"
-                mx={2}
-            >
-            <Button color="primary" variant="contained" onClick={props.startAlgorithm}>Run</Button>
             </Box>
             <Box
                 display="flex"
@@ -46,7 +41,7 @@ export default function AppBar(props) {
                     aria-valuetext="ms"
                     valueLabelDisplay="auto"
                     step={10}
-                    min={5}
+                    min={1}
                     max={200}
                     defaultValue={props.delay}
                     onChange={(e, v) => props.onDelayChange(v)}
@@ -55,6 +50,21 @@ export default function AppBar(props) {
             <Typography>
                 {`${props.delay} ms.`}
             </Typography>
+            <Box mx={2}>
+                <FormControl component="fieldset">
+                    <FormLabel component="legend">Set Position</FormLabel>
+                        <RadioGroup row aria-label="position" name="position" value={props.destination} onChange={props.setDestination}>
+                        <FormControlLabel value="start" control={<Radio />} label="Start" />
+                        <FormControlLabel value="end" control={<Radio />} label="End" />
+                        </RadioGroup>
+                </FormControl>
+            </Box>
+            <Box mx={2}>
+                <Button color="secondary" variant="contained" onClick={props.clearBoard}>Clear</Button>
+            </Box>
+            <Box mx={2}>
+                <Button color="primary" variant="contained" onClick={props.startAlgorithm}>Run</Button>
+            </Box>
         </Box>
     </React.Fragment>
 }

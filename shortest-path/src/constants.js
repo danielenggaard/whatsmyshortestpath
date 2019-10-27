@@ -9,19 +9,23 @@ const states = {
 const colors = {
     [states.UNDISCOVERED] : 'rgb(230, 230, 230)',
     [states.DISCOVERED] : 'rgb(100, 100, 100)',
-    [states.START] : 'rgb(255, 0, 0)',
-    [states.END] : 'rgb(0, 255, 0)',
+    [states.START] : 'rgb(0, 255, 0)',
+    [states.END] : 'rgb(255, 0, 0)',
     [states.PATH] : 'rgb(0, 0, 255)'
 }
 
-const fields = {
-    start: 10,
-    end: 800
+const styles = {
+    [states.UNDISCOVERED] : 'undiscovered',
+    [states.DISCOVERED] : 'discovered',
+    [states.START] : 'start',
+    [states.END] : 'end',
+    [states.PATH] : 'path'
 }
+
 
 
 
 const rows = 30;
 const columns = 30;
 
-export { states, rows, columns, colors, fields }
+export { states, rows, columns, colors, styles }

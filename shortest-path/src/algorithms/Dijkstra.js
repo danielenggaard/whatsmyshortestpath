@@ -1,6 +1,5 @@
 import IndexMinPQ from '../datastructures/IndexMinPQ';
 import { states } from "../constants"
-import { mapSquareToIndex } from './operations';
 
 export default class Dijkstra {
 
@@ -16,19 +15,18 @@ export default class Dijkstra {
     setBoard = board => this.board = board;
 
     async invoke() {
-
-
         this.setUp();
         while(!this.pq.isEmpty()) {
             const min = this.pq.delMin();
             if(min === this.end) break;
-            
             await this.relax(min);
         }
 
         const path = this.pathTo(this.end);
         for(let i = 0; i < path.length; i++) 
             await this.board.setVisited(path[i].from, states.PATH);
+        this.board.algoIsOn = false;
+
     }
 
     setUp() {
