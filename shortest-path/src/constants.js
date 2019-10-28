@@ -25,11 +25,16 @@ const styles = {
 const shortestPaths = {
     DIJKSTRA: 1,
     ASTAR: 2,
-    DFS: 3
+    DFS: 3  // Will implement later
+}
+
+const heuristics = {
+    EUCLIDEAN: 1,
+    MANHATTAN: 2
 }
 
 
 const rows = 30;
 const columns = 30;
 
-export { states, rows, columns, colors, styles, shortestPaths }
+export { states, rows, columns, colors, styles, shortestPaths, heuristics }

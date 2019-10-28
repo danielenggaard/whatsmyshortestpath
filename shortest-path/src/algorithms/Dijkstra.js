@@ -52,7 +52,10 @@ export default class Dijkstra {
         distTo[to] = this.distTo[e.from] + e.weight;
         this.edgeTo[to] = e;
 
+        this.board.incrementRelaxEdges();
         await this.board.setVisited(to, states.DISCOVERED);
+        
+        
         return new Promise(resolve => {
             if (pq.contains(to)) pq.change(to, distTo[to]);
             else                 pq.insert(to, distTo[to]);

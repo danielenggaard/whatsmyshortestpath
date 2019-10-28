@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { states, rows, columns, colors, styles, shortestPaths } from '../constants';
+import { states, rows, columns, colors, styles, shortestPaths, heuristics } from '../constants';
 import GraphBuilder from "./GraphBuilder";
 import { mapIndexToSquare, mapSquareToIndex } from '../algorithms/operations';
 import AppBar from './AppBar';
@@ -17,10 +17,14 @@ export default class Border extends Component  {
             squareClick: "start",
             start: 1,
             end: 10,
+            heuristicName: heuristics.EUCLIDEAN,
+            relaxedEdges: 0
         }
         this.algoIsOn = false;
         this.bindMethods();
     }
+
+    setHeuristic = e => this.setState({ heuristicName: e.target.value })
 
     bindMethods() {
         this.onDelayChange = this.onDelayChange.bind(this);
@@ -28,13 +32,15 @@ export default class Border extends Component  {
         this.setDestination = this.setDestination.bind(this);
         this.handleSquareClick = this.handleSquareClick.bind(this);
         this.initBoard = this.initBoard.bind(this);
+        this.setHeuristic = this.setHeuristic.bind(this);
+        this.incrementRelaxEdges = this.incrementRelaxEdges.bind(this);
+        this.resetRelaxEdges = this.resetRelaxEdges.bind(this);
     }
 
     setAlgorithmsParams() {
-        const { start, end, board } = this.state;
+        const { start, end, board, heuristicName } = this.state;
         algorithms[shortestPaths.DIJKSTRA].args = [this.g, rows * columns, start, end, board];
-        // Todo: make heuristic optional
-        algorithms[shortestPaths.ASTAR].args = [this.g, rows * columns, start, end, board, heuristic.MANHATTEN];
+        algorithms[shortestPaths.ASTAR].args = [this.g, rows * columns, start, end, board, heuristic[heuristicName]];
     }
 
     setDestination = e => this.setState({ squareClick: e.target.value });
@@ -68,6 +74,7 @@ export default class Border extends Component  {
 
     initBoard() {
         let { start, end, board } = this.state;
+        this.resetRelaxEdges();
 
         for(let row = 0; row < rows; row++) {
             board[row] = [];
@@ -139,10 +146,13 @@ export default class Border extends Component  {
         this.algo.setBoard(this);
     }
 
-    
+    incrementRelaxEdges = () => this.setState({ relaxedEdges: this.state.relaxedEdges + 1 });
+
+    resetRelaxEdges = () => this.setState({ relaxedEdges: 0 });
 
     startAlgorithm() {
-        const { board } = this.state;
+        const { board, start, end } = this.state;
+        if (!start || !end || start === end) return;
         this.initBoard();
         this.algoIsOn = true;
         this.g = new GraphBuilder(board, rows, columns).build();
@@ -169,8 +179,7 @@ export default class Border extends Component  {
     }
 
     render() {
-        const { delay, algorithm } = this.state;
-
+        const { delay, algorithm, heuristicName, relaxedEdges } = this.state;
         return <React.Fragment>
             <AppBar
                 setAlgorithm={this.setAlgorithm}
@@ -182,6 +191,9 @@ export default class Border extends Component  {
                 destination={this.state.squareClick}
                 clearBoard={this.initBoard}
                 onAlgoIsOn={this.onAlgoIsOn}
+                setHeuristic={this.setHeuristic}
+                heuristicName={heuristicName}
+                relaxedEdges={relaxedEdges}
             />
         
         <table

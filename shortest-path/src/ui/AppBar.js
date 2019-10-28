@@ -1,11 +1,27 @@
 import React from 'react'
-import { shortestPaths }from '../constants';
+import { shortestPaths, heuristics }from '../constants';
 import { MenuItem, Select, FormControl, InputLabel, Box, 
         Button, Typography, Slider, Radio, RadioGroup, FormLabel, 
         FormControlLabel } from "@material-ui/core";
 
 export default function AppBar(props) {
 
+    function renderHeuristics() {
+        if (props.algorithm === shortestPaths.ASTAR) {
+            return <Box mx={4}>
+                        <FormControl>
+                            <InputLabel>Heuristic</InputLabel>
+                            <Select
+                                value={props.heuristicName}
+                                onChange={props.setHeuristic}
+                            >
+                                <MenuItem value={heuristics.EUCLIDEAN}>Euclidean Distance</MenuItem>
+                                <MenuItem value={heuristics.MANHATTAN}>Manhattan Distance</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+        }
+    }
 
     return <React.Fragment>
         
@@ -16,6 +32,7 @@ export default function AppBar(props) {
             alignItems="center"
             my={4}
         >
+            {renderHeuristics()}
             <Box mx={4}>
                 <FormControl>
                     <InputLabel>Algorithm</InputLabel>
@@ -28,6 +45,11 @@ export default function AppBar(props) {
                     </Select>
                 </FormControl>
             </Box>
+
+            <Box mx={2}>
+                <Typography>Relaxed edges: {props.relaxedEdges}</Typography>
+            </Box>
+            
             <Box
                 display="flex"
                 flexDirection="column"
@@ -61,7 +83,7 @@ export default function AppBar(props) {
                 </FormControl>
             </Box>
             <Box mx={2}>
-                <Button color="secondary" variant="contained" onClick={props.clearBoard}>Clear</Button>
+                <Button color="default" variant="outlined" onClick={props.clearBoard}>Clear</Button>
             </Box>
             <Box mx={2}>
                 <Button color="primary" variant="contained" onClick={props.startAlgorithm}>Start</Button>

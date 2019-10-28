@@ -1,6 +1,6 @@
 import AStar from './AStar';
 import Dijkstra from './Dijkstra';
-import { shortestPaths } from '../constants';
+import { shortestPaths, heuristics } from '../constants';
 import  { eucledianHeuristic, manhattenHeuristic } from "./operations"
 
 // this.g, rows * columns, fields.start, fields.end, board
@@ -10,8 +10,8 @@ export const algorithms = {
 }
 
 export const heuristic = {
-    EUCLEDIAN: eucledianHeuristic,
-    MANHATTEN: manhattenHeuristic
+    [heuristics.EUCLIDEAN]: eucledianHeuristic,
+    [heuristics.MANHATTAN]: manhattenHeuristic
 }
 
 export const instantiate = className => 
