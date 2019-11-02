@@ -1,6 +1,7 @@
 import DirectedEdge from '../datastructures/DirectedEdge';
 import { eucledian, mapSquareToIndex } from "../algorithms/operations";
 import Digraph from '../datastructures/Digraph';
+import { states } from '../constants';
 
 
 export default class GraphBuilder {
@@ -22,10 +23,14 @@ export default class GraphBuilder {
     }
 
     validSquare(row, column) {
-        if (row < 0 || row >= this.rows || column < 0 || column >= this.columns)
-            return false;
+        if (this.squareOutOfRange(row, column) || !this.squareCanBeReached(row, column)) return false;
         return true;
     }
+
+    squareCanBeReached = (row, column) => this.board[row][column].state !== states.WALL;
+    
+
+    squareOutOfRange = (row, column) => row < 0 || row >= this.rows || column < 0 || column >= this.columns
 
     addEdge(from, to) {
 

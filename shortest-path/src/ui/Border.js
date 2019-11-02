@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
-import { states, rows, columns, colors, styles, shortestPaths, heuristics } from '../constants';
+import { states, rows, columns, colors, styles, shortestPaths, heuristics, options } from '../constants';
 import GraphBuilder from "./GraphBuilder";
 import { mapIndexToSquare, mapSquareToIndex } from '../algorithms/operations';
 import AppBar from './AppBar';
 import { instantiate, algorithms, heuristic } from '../algorithms/Factory';
-import './States.css';
 
 export default class Border extends Component  {
 
@@ -14,9 +13,9 @@ export default class Border extends Component  {
             board: [],
             delay: 1,    // Unit is in ms.
             algorithm: shortestPaths.ASTAR,
-            squareClick: "start",
+            option: options.SET_START,
             start: 1,
-            end: 10,
+            end: 2,
             heuristicName: heuristics.EUCLIDEAN,
             relaxedEdges: 0
         }
@@ -29,7 +28,7 @@ export default class Border extends Component  {
     bindMethods() {
         this.onDelayChange = this.onDelayChange.bind(this);
         this.startAlgorithm = this.startAlgorithm.bind(this);
-        this.setDestination = this.setDestination.bind(this);
+        this.setOption = this.setOption.bind(this);
         this.handleSquareClick = this.handleSquareClick.bind(this);
         this.initBoard = this.initBoard.bind(this);
         this.setHeuristic = this.setHeuristic.bind(this);
@@ -43,19 +42,29 @@ export default class Border extends Component  {
         algorithms[shortestPaths.ASTAR].args = [this.g, rows * columns, start, end, board, heuristic[heuristicName]];
     }
 
-    setDestination = e => this.setState({ squareClick: e.target.value });
+    setOption = e => this.setState({ option: e.target.value }); 
 
     setAlgorithm = e => this.setState({ algorithm: e.target.value });
 
     handleSquareClick = (e, square) => {
-        switch(this.state.squareClick) {
-            case "start":
+        switch(this.state.option) {
+            case options.SET_START:
                 this.setStart(mapSquareToIndex(square))
-            break;
-            case "end":
+                break;
+            case options.SET_END:
                 this.setEnd(mapSquareToIndex(square))
-            break;
+                break;
+            case options.SET_WALL:
+                this.onSetWall(e, square);
+                break;
         }
+    }
+
+    onSetWall = (e, square) => {
+        const { option, board } = this.state;
+        if (!(option === options.SET_WALL) || e.buttons !== 1) return;
+        square.state = states.WALL;
+        this.setState({ board });
     }
 
     createArea(row, column) {
@@ -89,7 +98,7 @@ export default class Border extends Component  {
         this.setState({ board });
     }
 
-    onAlgoIsOn = e => this.algoIsOn = e.target.value;
+    onAlgoIsOn = isOn => this.algoIsOn = isOn;
 
     onDelayChange = delay => this.setState({ delay });
 
@@ -107,6 +116,7 @@ export default class Border extends Component  {
                         backgroundColor: colors[square.state],
                     }}
                     onClick={e => this.handleSquareClick(e, square)}
+                    onMouseOver={e => this.onSetWall(e, square)}
                 >
                 </td>
                 )
@@ -146,6 +156,21 @@ export default class Border extends Component  {
         this.algo.setBoard(this);
     }
 
+    clearSquare(square) {
+        if (square.state === states.DISCOVERED ||square.state === states.PATH)
+            square.state = states.UNDISCOVERED;
+    }
+    
+    clearBoard() {
+        const { board } = this.state;
+        board.forEach(row => {
+            row.forEach(column => {
+                this.clearSquare(column);
+            })
+        });
+        this.setState({ board });
+    }
+    
     incrementRelaxEdges = () => this.setState({ relaxedEdges: this.state.relaxedEdges + 1 });
 
     resetRelaxEdges = () => this.setState({ relaxedEdges: 0 });
@@ -153,17 +178,24 @@ export default class Border extends Component  {
     startAlgorithm() {
         const { board, start, end } = this.state;
         if (!start || !end || start === end) return;
-        this.initBoard();
+        this.clearBoard();
         this.algoIsOn = true;
-        this.g = new GraphBuilder(board, rows, columns).build();
+        this.g = this.graphBuilder = new GraphBuilder(board, rows, columns).build();
         this.createAlgorithm();
         this.algo.invoke();
         this.algo = null;
         this.g = null;
     }
 
+    validatePositionSet(position) {
+        const square = mapIndexToSquare(position, this.state.board)
+        if (square.state === states.START || square.state === states.END) return false;
+        return true;
+    }
+
     setStart(s) {
         const { board, start } = this.state;
+        if (!this.validatePositionSet(s)) return;
         const newStart = mapIndexToSquare(s, board);
         if(typeof start === "number") mapIndexToSquare(start, board).state = states.UNDISCOVERED;
         newStart.state = states.START;
@@ -172,6 +204,7 @@ export default class Border extends Component  {
 
     setEnd(e) {
         const { board, end } = this.state;
+        if(!this.validatePositionSet(e)) return;
         const newEnd = mapIndexToSquare(e, board);
         if (typeof end === "number") mapIndexToSquare(end, board).state = states.UNDISCOVERED;
         newEnd.state = states.END;
@@ -179,7 +212,7 @@ export default class Border extends Component  {
     }
 
     render() {
-        const { delay, algorithm, heuristicName, relaxedEdges } = this.state;
+        const { delay, algorithm, heuristicName, relaxedEdges, option } = this.state;
         return <React.Fragment>
             <AppBar
                 setAlgorithm={this.setAlgorithm}
@@ -187,13 +220,14 @@ export default class Border extends Component  {
                 startAlgorithm={this.startAlgorithm}
                 onDelayChange={this.onDelayChange}
                 delay={delay}
-                setDestination={this.setDestination}
-                destination={this.state.squareClick}
+                setOption={this.setOption}
+                option={option}
                 clearBoard={this.initBoard}
                 onAlgoIsOn={this.onAlgoIsOn}
                 setHeuristic={this.setHeuristic}
                 heuristicName={heuristicName}
                 relaxedEdges={relaxedEdges}
+                algoIsOn={this.algoIsOn}
             />
         
         <table
