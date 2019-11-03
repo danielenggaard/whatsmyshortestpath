@@ -16,7 +16,7 @@ export default class Border extends Component  {
             option: options.SET_START,
             start: 1,
             end: 2,
-            heuristicName: heuristics.EUCLIDEAN,
+            heuristicName: heuristics.MANHATTAN,
             relaxedEdges: 0
         }
         this.algoIsOn = false;
@@ -46,6 +46,12 @@ export default class Border extends Component  {
 
     setAlgorithm = e => this.setState({ algorithm: e.target.value });
 
+    setAlgoIsOn = isOn => {
+        const { board } = this.state;
+        this.algoIsOn = isOn;
+        this.setState({ board });
+    }
+
     handleSquareClick = (e, square) => {
         switch(this.state.option) {
             case options.SET_START:
@@ -55,14 +61,39 @@ export default class Border extends Component  {
                 this.setEnd(mapSquareToIndex(square))
                 break;
             case options.SET_WALL:
-                this.onSetWall(e, square);
+                this.onSetWall(square);
+                break;
+            case options.SET_UNDISCOVERED:
+                this.onSetUndiscovered(square);
+                break;
+
+        }
+    }
+
+    handleSquareHover = (e, square) => {
+        if (e.buttons !== 1) return;
+        switch(this.state.option) {
+            case options.SET_WALL:
+                this.onSetWall(square);
+                break;
+            case options.SET_UNDISCOVERED:
+                this.onSetUndiscovered(square);
                 break;
         }
     }
 
-    onSetWall = (e, square) => {
+    onSetUndiscovered = square => {
         const { option, board } = this.state;
-        if (!(option === options.SET_WALL) || e.buttons !== 1) return;
+        if (this.algoIsOn || option !== options.SET_UNDISCOVERED || 
+            square.state === states.START || square.state === states.END) return;
+        square.state = states.UNDISCOVERED;
+        this.setState({ board });
+    }
+
+    onSetWall = square => {
+        const { option, board } = this.state;
+        if (this.algoIsOn || option !== options.SET_WALL ||
+            square.state === states.START || square.state === states.END) return;
         square.state = states.WALL;
         this.setState({ board });
     }
@@ -116,7 +147,7 @@ export default class Border extends Component  {
                         backgroundColor: colors[square.state],
                     }}
                     onClick={e => this.handleSquareClick(e, square)}
-                    onMouseOver={e => this.onSetWall(e, square)}
+                    onMouseOver={e => this.handleSquareHover(e, square)}
                 >
                 </td>
                 )

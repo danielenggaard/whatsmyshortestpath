@@ -24,10 +24,15 @@ export default class Dijkstra {
         }
 
         const path = this.pathTo(this.end);
+        if (!path) {
+            alert("No path was found!");
+            this.board.setAlgoIsOn(false);
+            return;
+        }
         await this.board.setVisited(path[0].to, states.END);
         for(let i = 0; i < path.length - 1; i++)
             await this.board.setVisited(path[i].from, states.PATH);
-        this.board.algoIsOn = false;
+        this.board.setAlgoIsOn(false);
     }
 
     setUp() {

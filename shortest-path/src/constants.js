@@ -9,11 +9,11 @@ const states = {
 
 const colors = {
     [states.UNDISCOVERED] : 'rgb(230, 230, 230)',
-    [states.DISCOVERED] : 'rgb(100, 100, 100)',
-    [states.START] : 'rgb(0, 255, 0)',
-    [states.END] : 'rgb(255, 0, 0)',
-    [states.PATH] : 'rgb(0, 0, 255)',
-    [states.WALL] : 'rgb(0, 0, 0)'
+    [states.DISCOVERED] : '#8d6e63',
+    [states.START] : '#4caf50',
+    [states.END] : '#f44336',
+    [states.PATH] : '#26c6da',
+    [states.WALL] : '#455a64'
 }
 
 const styles = {
@@ -35,7 +35,8 @@ const shortestPaths = {
 const options = {
     SET_START : '1',
     SET_END : '2',
-    SET_WALL : '3'
+    SET_WALL : '3',
+    SET_UNDISCOVERED : '4'
 }
 
 const heuristics = {

@@ -79,6 +79,7 @@ export default function AppBar(props) {
                         <FormControlLabel value={options.SET_START} control={<Radio />} label="Start" />
                         <FormControlLabel value={options.SET_END} control={<Radio />} label="End" />
                         <FormControlLabel value={options.SET_WALL} control={<Radio />} label="Wall" />
+                        <FormControlLabel value={options.SET_UNDISCOVERED} control={<Radio />} label="Erase" />
                         </RadioGroup>
                 </FormControl>
             </Box>
