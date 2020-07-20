@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.js": "/whatsmyshortestpath/static/js/main.2adfbed0.chunk.js",
+    "main.js.map": "/whatsmyshortestpath/static/js/main.2adfbed0.chunk.js.map",
+    "runtime-main.js": "/whatsmyshortestpath/static/js/runtime-main.d5eeeec4.js",
+    "runtime-main.js.map": "/whatsmyshortestpath/static/js/runtime-main.d5eeeec4.js.map",
+    "static/js/2.5a8b4c41.chunk.js": "/whatsmyshortestpath/static/js/2.5a8b4c41.chunk.js",
+    "static/js/2.5a8b4c41.chunk.js.map": "/whatsmyshortestpath/static/js/2.5a8b4c41.chunk.js.map",
+    "index.html": "/whatsmyshortestpath/index.html",
+    "precache-manifest.ab945a2dda649f38571df202bbe7971d.js": "/whatsmyshortestpath/precache-manifest.ab945a2dda649f38571df202bbe7971d.js",
+    "service-worker.js": "/whatsmyshortestpath/service-worker.js",
+    "static/js/2.5a8b4c41.chunk.js.LICENSE.txt": "/whatsmyshortestpath/static/js/2.5a8b4c41.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.d5eeeec4.js",
+    "static/js/2.5a8b4c41.chunk.js",
+    "static/js/main.2adfbed0.chunk.js"
+  ]
+}
